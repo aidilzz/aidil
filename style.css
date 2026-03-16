@@ -326,9 +326,10 @@ body {
     letter-spacing: -1px;
 }
 
-/* Reveal animation */
-.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
-.reveal.visible { opacity: 1; transform: translateY(0); }
+/* Reveal animation — default visible; JS adds hidden-init AFTER page load */
+.reveal { opacity: 1; transform: none; transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.hidden-init { opacity: 0; transform: translateY(30px); }
+.reveal.visible { opacity: 1 !important; transform: translateY(0) !important; }
 
 /* =========================================
    ABOUT

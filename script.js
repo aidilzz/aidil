@@ -63,95 +63,98 @@
     }
 
     // ---- NEURAL CANVAS ----
-    const canvas = document.getElementById('neural-bg');
-    if (canvas) {
-        const ctx = canvas.getContext('2d');
-        let nodes = [], animId, isAnim = true;
+    try {
+        const canvas = document.getElementById('neural-bg');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            let nodes = [], animId, isAnim = true;
 
-        const cfg = () => ({
-            count: isMobile() ? 35 : 80,
-            dist: isMobile() ? 100 : 140,
-            speed: isMobile() ? 0.25 : 0.45,
-        });
+            const cfg = () => ({
+                count: isMobile() ? 35 : 80,
+                dist: isMobile() ? 100 : 140,
+                speed: isMobile() ? 0.25 : 0.45,
+            });
 
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-
-        class Node {
-            constructor() {
-                const c = cfg();
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * c.speed;
-                this.vy = (Math.random() - 0.5) * c.speed;
-                this.r = Math.random() * 2 + 1;
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
             }
-            update() {
-                this.x += this.vx; this.y += this.vy;
-                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-            }
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-                ctx.fillStyle = '#00c8a0';
-                ctx.fill();
-            }
-        }
 
-        function init() {
-            nodes = Array.from({ length: cfg().count }, () => new Node());
-        }
+            class Node {
+                constructor() {
+                    const c = cfg();
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.vx = (Math.random() - 0.5) * c.speed;
+                    this.vy = (Math.random() - 0.5) * c.speed;
+                    this.r = Math.random() * 2 + 1;
+                }
+                update() {
+                    this.x += this.vx; this.y += this.vy;
+                    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+                    ctx.fillStyle = '#00c8a0';
+                    ctx.fill();
+                }
+            }
 
-        function connect() {
-            const d = cfg().dist;
-            for (let i = 0; i < nodes.length; i++) {
-                for (let j = i + 1; j < nodes.length; j++) {
-                    const dx = nodes[i].x - nodes[j].x;
-                    const dy = nodes[i].y - nodes[j].y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < d) {
-                        ctx.beginPath();
-                        ctx.moveTo(nodes[i].x, nodes[i].y);
-                        ctx.lineTo(nodes[j].x, nodes[j].y);
-                        ctx.strokeStyle = `rgba(0, 200, 160, ${(1 - dist / d) * 0.5})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.stroke();
+            function init() {
+                nodes = Array.from({ length: cfg().count }, () => new Node());
+            }
+
+            function connect() {
+                const d = cfg().dist;
+                for (let i = 0; i < nodes.length; i++) {
+                    for (let j = i + 1; j < nodes.length; j++) {
+                        const dx = nodes[i].x - nodes[j].x;
+                        const dy = nodes[i].y - nodes[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < d) {
+                            ctx.beginPath();
+                            ctx.moveTo(nodes[i].x, nodes[i].y);
+                            ctx.lineTo(nodes[j].x, nodes[j].y);
+                            ctx.strokeStyle = `rgba(0, 200, 160, ${(1 - dist / d) * 0.5})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.stroke();
+                        }
                     }
                 }
             }
-        }
 
-        function animate() {
-            if (!isAnim) return;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            nodes.forEach(n => { n.update(); n.draw(); });
-            connect();
-            animId = requestAnimationFrame(animate);
-        }
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) { isAnim = false; cancelAnimationFrame(animId); }
-            else { isAnim = true; animate(); }
-        });
-
-        if (!reducedMotion()) {
-            resize(); init(); animate();
-        }
-
-        window.addEventListener('resize', debounce(() => { resize(); init(); }, 250));
-
-        // Pause on mobile scroll for battery
-        let scrollTimer;
-        window.addEventListener('scroll', () => {
-            if (isMobile()) {
-                isAnim = false;
-                clearTimeout(scrollTimer);
-                scrollTimer = setTimeout(() => { isAnim = true; animate(); }, 200);
+            function animate() {
+                if (!isAnim) return;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                nodes.forEach(n => { n.update(); n.draw(); });
+                connect();
+                animId = requestAnimationFrame(animate);
             }
-        }, { passive: true });
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) { isAnim = false; cancelAnimationFrame(animId); }
+                else { isAnim = true; animate(); }
+            });
+
+            if (!reducedMotion()) {
+                resize(); init(); animate();
+            }
+
+            window.addEventListener('resize', debounce(() => { resize(); init(); }, 250));
+
+            let scrollTimer;
+            window.addEventListener('scroll', () => {
+                if (isMobile()) {
+                    isAnim = false;
+                    clearTimeout(scrollTimer);
+                    scrollTimer = setTimeout(() => { isAnim = true; animate(); }, 200);
+                }
+            }, { passive: true });
+        }
+    } catch (e) {
+        console.warn('Canvas animation skipped:', e);
     }
 
     // ---- TYPED TEXT ----
@@ -243,30 +246,38 @@
     });
 
     // ---- INTERSECTION OBSERVER (reveal + skill bars) ----
-    if ('IntersectionObserver' in window) {
-        // Section reveal
+    const revealEls = document.querySelectorAll('.reveal');
+
+    if ('IntersectionObserver' in window && !reducedMotion()) {
+        // Hide elements first (only if JS is running and observer is supported)
+        revealEls.forEach(el => el.classList.add('hidden-init'));
+
         const revealObs = new IntersectionObserver((entries) => {
-            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); } });
-        }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-        document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.remove('hidden-init');
+                    e.target.classList.add('visible');
+                    revealObs.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.06, rootMargin: '0px 0px -30px 0px' });
+
+        revealEls.forEach(el => revealObs.observe(el));
 
         // Skill bar fill
-        if (!reducedMotion()) {
-            const skillObs = new IntersectionObserver((entries) => {
-                entries.forEach(e => {
-                    if (e.isIntersecting) {
-                        const fills = e.target.querySelectorAll('.skill-fill');
-                        fills.forEach(f => { f.style.width = f.dataset.w + '%'; });
-                        skillObs.unobserve(e.target);
-                    }
-                });
-            }, { threshold: 0.3 });
-            document.querySelectorAll('.skill-list').forEach(el => skillObs.observe(el));
-        } else {
-            document.querySelectorAll('.skill-fill').forEach(f => f.style.width = f.dataset.w + '%');
-        }
+        const skillObs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.querySelectorAll('.skill-fill').forEach(f => { f.style.width = f.dataset.w + '%'; });
+                    skillObs.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.3 });
+        document.querySelectorAll('.skill-list').forEach(el => skillObs.observe(el));
+
     } else {
-        document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+        // Fallback: show everything immediately
+        revealEls.forEach(el => el.classList.add('visible'));
         document.querySelectorAll('.skill-fill').forEach(f => f.style.width = f.dataset.w + '%');
     }
 
