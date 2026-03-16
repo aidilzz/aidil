@@ -14,18 +14,22 @@
         return (...args) => { if (!ok) return; fn(...args); ok = false; setTimeout(() => ok = true, ms); };
     }
     const isMobile = () => window.innerWidth <= 768;
-    const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reducedMotion = () => { try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch(e) { return false; } };
 
     // ---- LOADER ----
     const loader = document.getElementById('loader');
     function hideLoader() {
-        if (loader) {
-            loader.classList.add('hidden');
-            setTimeout(() => loader.style.display = 'none', 600);
-        }
+        if (!loader) return;
+        loader.style.opacity = '0';
+        loader.style.visibility = 'hidden';
+        loader.style.pointerEvents = 'none';
+        setTimeout(function() { loader.style.display = 'none'; }, 600);
     }
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(hideLoader, 500);
+    });
     window.addEventListener('load', hideLoader);
-    setTimeout(hideLoader, 3000);
+    setTimeout(hideLoader, 1500);
 
     // ---- CUSTOM CURSOR ----
     const cursor = document.getElementById('cursor');

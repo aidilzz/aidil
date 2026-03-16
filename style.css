@@ -52,7 +52,7 @@ body {
 /* ---- CANVAS BG ---- */
 #neural-bg {
     position: fixed;
-    inset: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     z-index: 0;
     opacity: 0.25;
     pointer-events: none;
@@ -89,7 +89,7 @@ body {
    LOADER
    ========================================= */
 #loader {
-    position: fixed; inset: 0; background: var(--bg);
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg);
     display: flex; align-items: center; justify-content: center;
     z-index: 99999;
     transition: opacity 0.5s ease, visibility 0.5s ease;
@@ -110,8 +110,8 @@ body {
    ========================================= */
 #navbar {
     position: fixed; top: 0; width: 100%;
-    background: rgba(8, 11, 16, 0.85);
-    backdrop-filter: blur(16px);
+    background: #080b10;
+    
     border-bottom: 1px solid var(--border2);
     z-index: 1000;
     transition: var(--transition);
@@ -195,7 +195,7 @@ body {
 
 .hero-name {
     font-family: var(--display);
-    font-size: clamp(3.5rem, 9vw, 8rem);
+    font-size: 5rem;
     font-weight: 800;
     line-height: 0.92;
     letter-spacing: -2px;
@@ -319,7 +319,7 @@ body {
 }
 .section-title {
     font-family: var(--display);
-    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-size: 2.8rem;
     font-weight: 800;
     color: var(--txt);
     line-height: 1.1;
@@ -758,7 +758,7 @@ footer {
 
     .hero { padding: 100px 20px 60px; }
     .hero-side-left, .hero-side-right { display: none; }
-    .hero-name { font-size: clamp(3rem, 12vw, 5rem); }
+    .hero-name { font-size: 3rem; }
 
     .section { padding: 70px 20px; }
 
